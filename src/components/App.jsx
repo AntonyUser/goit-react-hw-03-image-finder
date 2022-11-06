@@ -10,13 +10,13 @@ export class App extends Component {
   state = {
     searchQuery: '',
     imageList: [],
-    isLoading: 'false',
+    isLoading: false,
     error: '',
   };
 
   onSubmit = async ({ query }) => {
+    this.setState({ isLoading: true });
     try {
-      this.setState({ isLoading: 'true' });
       const imageList = await FetchImages(query);
       const {
         data: { hits },
@@ -28,7 +28,7 @@ export class App extends Component {
     } catch (error) {
       this.setState({ error: error.message });
     } finally {
-      this.setState({ isLoading: 'false' });
+      this.setState({ isLoading: false });
     }
   };
   render() {
@@ -36,7 +36,7 @@ export class App extends Component {
     return (
       <Main>
         <Searchbar onSubmit={this.onSubmit} />
-        {this.state.isLoading === 'true' && <Loader />}
+        {this.state.isLoading && <Loader />}
         {imageList.length > 0 && <ImageGallery itemList={imageList} />}
       </Main>
     );
