@@ -3,6 +3,7 @@ import { Component } from 'react';
 import { FetchImages } from './API/API';
 import { Main } from './App.styled';
 import { NewButton } from './Button/Button.styled';
+import { Helper } from './Helper/Helper';
 import { ImageGallery } from './ImageGallery/ImageGallery';
 import { Loader } from './Loader/Loader';
 import { Modal } from './Modal/Modal';
@@ -19,14 +20,30 @@ export class App extends Component {
   };
 
   componentDidUpdate = async (prevProps, prevState) => {
-    const { page } = this.state;
-    if (prevState.page !== page) {
+    const { page, searchQuery } = this.state;
+    if (prevState.searchQuery !== searchQuery) {
       this.setState({ isLoading: true });
-      await FetchImages(this.state.searchQuery, this.state.page)
+      try {
+        const imageList = await FetchImages(searchQuery, page);
+        const {
+          data: { hits },
+        } = imageList;
+        this.setState({
+          imageList: Helper(hits),
+        });
+      } catch (error) {
+        this.setState({ error: error.message });
+      } finally {
+        this.setState({ isLoading: false });
+      }
+    }
+    if (prevState.page !== page && page !== 1) {
+      this.setState({ isLoading: true });
+      await FetchImages(searchQuery, page)
         .then(res => {
           const { data } = res;
           this.setState(prevState => ({
-            imageList: [...prevState.imageList, ...data.hits],
+            imageList: [...prevState.imageList, ...Helper(data.hits)],
           }));
         })
         .catch(error => {
@@ -43,21 +60,10 @@ export class App extends Component {
   };
 
   onSubmit = async ({ query }) => {
-    this.setState({ isLoading: true });
-    try {
-      const imageList = await FetchImages(query, this.state.page);
-      const {
-        data: { hits },
-      } = imageList;
-      this.setState({
-        searchQuery: query,
-        imageList: hits,
-      });
-    } catch (error) {
-      this.setState({ error: error.message });
-    } finally {
-      this.setState({ isLoading: false });
-    }
+    this.setState({
+      searchQuery: query,
+      page: 1,
+    });
   };
 
   loadMore = () => {
@@ -84,7 +90,9 @@ export class App extends Component {
           <>
             <ImageGallery itemList={imageList} onClick={this.onClick} />
             {!isLoading && (
-              <NewButton text="Load More" clickHandler={this.loadMore} />
+              <NewButton type="button" onClick={this.loadMore}>
+                Load More
+              </NewButton>
             )}
           </>
         )}

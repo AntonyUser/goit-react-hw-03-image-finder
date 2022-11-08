@@ -40,8 +40,8 @@ export class Modal extends Component {
 
 Modal.propTypes = {
   img: PropTypes.shape({
-    largeImageURL: PropTypes.string,
-    user: PropTypes.string,
+    largeImageURL: PropTypes.string.isRequired,
+    user: PropTypes.string.isRequired,
   }),
-  closeModal: PropTypes.func,
+  closeModal: PropTypes.func.isRequired,
 };

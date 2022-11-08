@@ -9,6 +9,6 @@ export const Button = ({ text, clickHandler }) => {
 };
 
 Button.propTypes = {
-  text: PropTypes.string,
-  clickHandler: PropTypes.func,
+  text: PropTypes.string.isRequired,
+  clickHandler: PropTypes.func.isRequired,
 };
