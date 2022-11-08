@@ -12,6 +12,9 @@ export class Searchbar extends Component {
   state = {
     query: '',
   };
+  static propTypes = {
+    onSubmit: PropTypes.func,
+  };
   onChange = e => {
     const { name, value } = e.currentTarget;
     this.setState({ [name]: value });
@@ -23,6 +26,7 @@ export class Searchbar extends Component {
       };
     });
   }
+
   render() {
     return (
       <>
@@ -61,7 +65,3 @@ export class Searchbar extends Component {
     );
   }
 }
-
-Searchbar.propTypes = {
-  onSubmit: PropTypes.func,
-};
